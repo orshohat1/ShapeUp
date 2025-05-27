@@ -17,14 +17,14 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Log in to ACR
-        run: |
-          az acr login --name orproject
+        run: az acr login --name orproject
 
       - name: Build and push Docker image to ACR
         run: |
-          IMAGE_NAME=orproject/shapeup-backend:latest
+          IMAGE_NAME=orproject.azurecr.io/shapeup-backend:latest
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
