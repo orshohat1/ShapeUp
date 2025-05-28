@@ -36,7 +36,7 @@ jobs:
           username: cs114
           password: ${{ secrets.VM_PASSWORD }}
           script: |
-            az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET}} --tenant ${{ secrets.AZURE_TENANT_ID }}
+            docker login orproject.azurecr.io -u ${{ secrets.AZURE_CLIENT_ID }}  -p ${{ secrets.AZURE_CLIENT_SECRET}}
             az acr login --name orproject
             cd /home/cs114/deployment
             docker compose pull
