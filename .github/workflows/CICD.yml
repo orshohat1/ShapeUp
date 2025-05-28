@@ -18,6 +18,10 @@ jobs:
           
       - name: Log in to ACR
         run: az acr login --name orproject
+      
+      - name: Create .env.production file
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION_CONTENT }}" > .env.production
 
       - name: Build and push Docker image to ACR
         run: |
@@ -32,6 +36,8 @@ jobs:
           username: cs114
           password: ${{ secrets.VM_PASSWORD }}
           script: |
-            cd /deployment
+            az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET}} --tenant ${{ secrets.AZURE_TENANT_ID }}
+            az acr login --name orproject
+            cd /home/cs114/deployment
             docker compose pull
             docker compose up -d
