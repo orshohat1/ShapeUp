@@ -46,7 +46,7 @@ app.use(cookieParser());
 // Access variables using process.env
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer(); // No Express here
+const server = http.createServer();
 const io = new Server(server, {
   path: "/users-chat",
   cors: { origin: "*", methods: ["GET", "POST"] },
