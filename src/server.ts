@@ -47,14 +47,13 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 
 const socketServer = http.createServer((req, res) => {
-  if (req.url === "/users-chat/") {
-    res.writeHead(426, { 'Content-Type': 'text/plain' });
-    res.end("Upgrade Required");
-  } else {
-    res.writeHead(404);
-    res.end("Not Found");
+  if (req.url?.startsWith("/users-chat")) {
+    return;
   }
+  res.writeHead(404);
+  res.end("Not Found");
 });
+
 export const socketIOServer = new Server(socketServer, {
   path: "/users-chat",
   cors: { origin: "*", methods: ["GET", "POST"] },
