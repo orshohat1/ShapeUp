@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/src/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/src/assets', express.static(path.join(__dirname, 'assets')));
 
 // Google OAuth
