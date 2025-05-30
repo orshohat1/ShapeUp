@@ -47,21 +47,21 @@ app.use(cookieParser());
 // Access variables using process.env
 const PORT = process.env.PORT || 3000;
 
-const socketServer = http.createServer((req, res) => {
-  if (req.url?.startsWith("/users-chat/socket.io")) {
-    return;
+const httpServer = http.createServer(app);
+
+export const socketIOServer = new Server(httpServer, {
+  path: "/users-chat/socket.io",
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
   }
-  res.writeHead(404);
-  res.end("Not Found");
 });
 
-export const socketIOServer = new Server(socketServer, {
-  path: "/users-chat/socket.io",
-  cors: { origin: "*", methods: ["GET", "POST"] },
-});
 initChat(socketIOServer);
-socketServer.listen(process.env.HTTP_SERVER_PORT, () => {
-  console.log(`Chat server is running on port ${process.env.HTTP_SERVER_PORT}`);
+
+// Start both API and WebSocket on same port
+httpServer.listen(process.env.HTTP_SERVER_PORT || 3002, () => {
+  console.log("Chat+API server running on", process.env.HTTP_SERVER_PORT || 3002);
 });
 
 
