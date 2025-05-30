@@ -12,6 +12,7 @@ class UserController {
   static async updateUserById(req: Request, res: Response): Promise<void> {
     const { firstName, lastName, street, city } = req.body;
     const { userId } = req.params;
+    const protocol = process.env.NODE_ENV === "production" ? "https" : req.protocol;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -39,7 +40,7 @@ class UserController {
       let avatarUrl = user.avatarUrl;
       if (avatar) {
         UserController.deleteFile(user.avatarUrl);
-        avatarUrl = `${req.protocol}://${req.get("host")}/src/uploads/${
+        avatarUrl = `${protocol}://${req.get("host")}/src/uploads/${
           avatar.filename
         }`;
       }
