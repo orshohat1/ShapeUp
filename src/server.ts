@@ -46,7 +46,7 @@ app.use(cookieParser());
 // Access variables using process.env
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer();
+const server = http.createServer(app);
 export const socketIOServer = new Server(server, {
   path: "/users-chat",
   cors: {
