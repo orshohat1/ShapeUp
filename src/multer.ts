@@ -10,7 +10,8 @@ const FILE_TYPES: Record<string, string> = {
 
 const storage: StorageEngine = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = "/app/uploads";
+    // const uploadPath = "/app/uploads";
+    const uploadPath = process.env.NODE_ENV === "production" ? "/app/uploads" : path.join(__dirname, "uploads");
 
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
