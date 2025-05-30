@@ -25,6 +25,8 @@ class GymController {
 
       let { name, city, street, streetNumber, description } = req.body;
       const ownerQueryString = req.query.owner as string;
+      const protocol = process.env.NODE_ENV === "production" ? "https" : req.protocol;
+
 
       if (!req.files || !(req.files as Express.Multer.File[]).length) {
         res
@@ -50,7 +52,7 @@ class GymController {
 
       const pictures = (req.files as Express.Multer.File[]).map(
         (file) =>
-          `${req.protocol}://${req.get("host")}/src/uploads/${file.filename}`
+          `${protocol}://${req.get("host")}/src/uploads/${file.filename}`
       );
 
       const defaultOpeningHours = {
@@ -120,6 +122,7 @@ class GymController {
   // Update gym details
   static async updateGymById(req: Request, res: Response): Promise<void> {
     try {
+      const protocol = process.env.NODE_ENV === "production" ? "https" : req.protocol;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ message: "Validation error", error: errors.array() });
@@ -172,7 +175,7 @@ class GymController {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       if (files?.["pictures[]"]) {
         const uploaded = files["pictures[]"].map(
-          (file) => `${req.protocol}://${req.get("host")}/src/uploads/${file.filename}`
+          (file) => `${protocol}://${req.get("host")}/src/uploads/${file.filename}`
         );
         pictures = [...pictures, ...uploaded];
       }
