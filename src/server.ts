@@ -46,15 +46,13 @@ app.use(cookieParser());
 // Access variables using process.env
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer();
-const io = new Server(server, {
+const socketServer = http.createServer(); // no Express here
+export const socketIOServer = new Server(socketServer, {
   path: "/users-chat",
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
-
-initChat(io);
-
-server.listen(process.env.HTTP_SERVER_PORT, () => {
+initChat(socketIOServer);
+socketServer.listen(process.env.HTTP_SERVER_PORT, () => {
   console.log(`Chat server is running on port ${process.env.HTTP_SERVER_PORT}`);
 });
 
