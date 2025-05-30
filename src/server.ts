@@ -46,7 +46,15 @@ app.use(cookieParser());
 // Access variables using process.env
 const PORT = process.env.PORT || 3000;
 
-const socketServer = http.createServer(); // no Express here
+const socketServer = http.createServer((req, res) => {
+  if (req.url === "/users-chat/") {
+    res.writeHead(426, { 'Content-Type': 'text/plain' });
+    res.end("Upgrade Required");
+  } else {
+    res.writeHead(404);
+    res.end("Not Found");
+  }
+});
 export const socketIOServer = new Server(socketServer, {
   path: "/users-chat",
   cors: { origin: "*", methods: ["GET", "POST"] },
@@ -87,8 +95,7 @@ if (require.main === module) {
 
 
 cron.schedule("0 0 * * 0", async () => {
-  try
-  {
+  try {
     console.log("[CRON] Starting weekly gym stats AI analysis");
     let question = "I will send you details about each gym. please remember them for future use. ";
     const gyms = await Gym.find({}, { _id: 1, name: 1, openingHours: 1 });
@@ -98,26 +105,27 @@ cron.schedule("0 0 * * 0", async () => {
       if (!result.success || !result.data) {
         continue;
       }
-      
+
       const { averageRatingThisGym, averageRatingCityGyms } = result.data;
       question += `\n ${gym._id.toString()}: average ratings this gym: ${averageRatingThisGym}, average ratings for city gyms: ${averageRatingCityGyms}, `
       const insights = await fetchGymPurchaseInsights(gym._id.toString());
-      
+
       if (!insights) continue;
 
       question += `purchases in last week: ${insights.purchasesCountInLastWeek}, Average purchases in same city: ${insights.averagePurchasesCountInCity}, `;
-      
+
       if (
         gym.openingHours &&
         gym.openingHours.sundayToThursday &&
         gym.openingHours.friday &&
         gym.openingHours.saturday
       ) {
-        question += `Opening Hours: - Sunday to Thursday: ${gym.openingHours.sundayToThursday.from} to ${gym.openingHours.sundayToThursday.to} - Friday: ${gym.openingHours.friday.from} to ${gym.openingHours.friday.to} - Saturday: ${gym.openingHours.saturday.from} to ${gym.openingHours.saturday.to}`;  
-    }
-    await askAI(question);
-    console.log("[CRON] Weekly analysis completed");
+        question += `Opening Hours: - Sunday to Thursday: ${gym.openingHours.sundayToThursday.from} to ${gym.openingHours.sundayToThursday.to} - Friday: ${gym.openingHours.friday.from} to ${gym.openingHours.friday.to} - Saturday: ${gym.openingHours.saturday.from} to ${gym.openingHours.saturday.to}`;
+      }
+      await askAI(question);
+      console.log("[CRON] Weekly analysis completed");
     }
   } catch (error) {
-      console.error("[CRON] Error during weekly gym stats AI analysis:", error);
-}});
+    console.error("[CRON] Error during weekly gym stats AI analysis:", error);
+  }
+});
