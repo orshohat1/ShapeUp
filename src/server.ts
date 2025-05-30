@@ -48,7 +48,7 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 
 const socketServer = http.createServer((req, res) => {
-  if (req.url?.startsWith("/users-chat")) {
+  if (req.url?.startsWith("/users-chat/socket.io")) {
     return;
   }
   res.writeHead(404);
@@ -56,7 +56,7 @@ const socketServer = http.createServer((req, res) => {
 });
 
 export const socketIOServer = new Server(socketServer, {
-  path: "/users-chat",
+  path: "/users-chat/socket.io",
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
 initChat(socketIOServer);
