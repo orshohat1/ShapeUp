@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/src/uploads', express.static("/app/uploads"));
 app.use('/src/assets', express.static(path.join(__dirname, 'assets')));
 
 // Google OAuth
@@ -46,18 +46,23 @@ app.use(cookieParser());
 // Access variables using process.env
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer();
-export const socketIOServer = new Server(server, {
-  path: "/users-chat",
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
+const socketServer = http.createServer((req, res) => {
+  if (req.url?.startsWith("/users-chat")) {
+    return;
+  }
+  res.writeHead(404);
+  res.end("Not Found");
 });
-initChat(socketIOServer)
-server.listen(process.env.HTTP_SERVER_PORT, () => {
+
+export const socketIOServer = new Server(socketServer, {
+  path: "/users-chat",
+  cors: { origin: "*", methods: ["GET", "POST"] },
+});
+initChat(socketIOServer);
+socketServer.listen(process.env.HTTP_SERVER_PORT, () => {
   console.log(`Chat server is running on port ${process.env.HTTP_SERVER_PORT}`);
 });
+
 
 app.use(
   cors({
@@ -89,8 +94,7 @@ if (require.main === module) {
 
 
 cron.schedule("0 0 * * 0", async () => {
-  try
-  {
+  try {
     console.log("[CRON] Starting weekly gym stats AI analysis");
     let question = "I will send you details about each gym. please remember them for future use. ";
     const gyms = await Gym.find({}, { _id: 1, name: 1, openingHours: 1 });
@@ -100,26 +104,27 @@ cron.schedule("0 0 * * 0", async () => {
       if (!result.success || !result.data) {
         continue;
       }
-      
+
       const { averageRatingThisGym, averageRatingCityGyms } = result.data;
       question += `\n ${gym._id.toString()}: average ratings this gym: ${averageRatingThisGym}, average ratings for city gyms: ${averageRatingCityGyms}, `
       const insights = await fetchGymPurchaseInsights(gym._id.toString());
-      
+
       if (!insights) continue;
 
       question += `purchases in last week: ${insights.purchasesCountInLastWeek}, Average purchases in same city: ${insights.averagePurchasesCountInCity}, `;
-      
+
       if (
         gym.openingHours &&
         gym.openingHours.sundayToThursday &&
         gym.openingHours.friday &&
         gym.openingHours.saturday
       ) {
-        question += `Opening Hours: - Sunday to Thursday: ${gym.openingHours.sundayToThursday.from} to ${gym.openingHours.sundayToThursday.to} - Friday: ${gym.openingHours.friday.from} to ${gym.openingHours.friday.to} - Saturday: ${gym.openingHours.saturday.from} to ${gym.openingHours.saturday.to}`;  
-    }
-    await askAI(question);
-    console.log("[CRON] Weekly analysis completed");
+        question += `Opening Hours: - Sunday to Thursday: ${gym.openingHours.sundayToThursday.from} to ${gym.openingHours.sundayToThursday.to} - Friday: ${gym.openingHours.friday.from} to ${gym.openingHours.friday.to} - Saturday: ${gym.openingHours.saturday.from} to ${gym.openingHours.saturday.to}`;
+      }
+      await askAI(question);
+      console.log("[CRON] Weekly analysis completed");
     }
   } catch (error) {
-      console.error("[CRON] Error during weekly gym stats AI analysis:", error);
-}});
+    console.error("[CRON] Error during weekly gym stats AI analysis:", error);
+  }
+});
