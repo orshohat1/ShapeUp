@@ -82,16 +82,13 @@ app.use("/purchase", purchaseRouter);
 
 export default app;
 
-export async function startServer(port = PORT) {
+(async () => {
   await connectDb();
-  return app.listen(port, () => console.log(`Server is up at ${port}`));
-}
-
-if (require.main === module) {
-  (async () => {
-    await startServer(PORT);
-  })();
-}
+  const PORT = process.env.HTTP_SERVER_PORT || 3000;
+  httpServer.listen(PORT, () => {
+    console.log("🌐 Unified API + WebSocket server running on", PORT);
+  });
+})();
 
 
 cron.schedule("0 0 * * 0", async () => {
