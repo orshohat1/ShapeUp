@@ -96,7 +96,7 @@ router.get(
 )
 
 
-router.get("/:gymId",
+router.get("/apis/:gymId",
     [
         param("gymId").notEmpty()
     ],
