@@ -70,6 +70,7 @@ class GymController {
         description,
         owner: ownerIdObject,
         openingHours: defaultOpeningHours,
+        prices: [0, 0, 0],
       });
 
       await newGym.save();
