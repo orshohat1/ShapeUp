@@ -5,8 +5,6 @@ import { fetchGymPurchaseInsights } from "./purchase-controller";
 import GymController from "./gym-controller";
 import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
 
-
-
 export const askAI = async (question: string): Promise<string | null> => {
   try {
     const endpoint = process.env.AZURE_OPENAI_ENDPOINT!;
