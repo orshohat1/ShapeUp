@@ -5,6 +5,9 @@ import verifyToken from "../middleware/verifyToken";
 
 const router = express.Router();
 
+router.post("/suggest-pricing/:gymId", verifyToken([IUserType.GYM_OWNER]), chatAIController.suggest_pricing);
+
+
 router.post("/:id", verifyToken([IUserType.USER, IUserType.GYM_OWNER]), chatAIController.ask_question);
 
 
