@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Add a new gym
 router.post(
-    "/",
+    "/data",
     upload.array("pictures", 5),
     [
         body("name").notEmpty().withMessage("Name is required."),
@@ -27,7 +27,7 @@ router.post(
 );
 
 router.put(
-    "/:gymId",
+    "/data/:gymId",
     upload.fields([{ name: "pictures[]", maxCount: 5 }]),
     [
         param("gymId")
@@ -50,10 +50,10 @@ router.put(
     GymController.updateGymById
 );
 
-router.get("/rating-stats/:gymId", GymController.getGymRatingStats);
+router.get("/data/rating-stats/:gymId", GymController.getGymRatingStats);
 
 router.get(
-    "/",
+    "/data",
     [
         query("owner")
             .isMongoId()
@@ -64,21 +64,21 @@ router.get(
 );
 
 router.get(
-    "/myGyms",
+    "/data/myGyms",
     verifyToken([IUserType.GYM_OWNER]),
     GymController.getMyGyms
 );
 
 router.delete(
-    "/:gymId",
+    "/data/:gymId",
     verifyToken([IUserType.GYM_OWNER, IUserType.ADMIN]),
     GymController.deleteGymById
 );
 
-router.get("/filterGymsByPriceAndCity", verifyToken([IUserType.USER]), GymController.filterGymsByPriceAndCity);
+router.get("/data/filterGymsByPriceAndCity", verifyToken([IUserType.USER]), GymController.filterGymsByPriceAndCity);
 
 router.get(
-    "/filter",
+    "/data/filter",
     [
         query("search")
             .notEmpty()
@@ -90,20 +90,20 @@ router.get(
 );
 
 router.get(
-    "/getAllGymsForAdmin",
+    "/data/getAllGymsForAdmin",
     verifyToken([IUserType.ADMIN]),
     GymController.getAllGymsForAdmin
 )
 
 
-router.get("/:gymId",
+router.get("/data/:gymId",
     [
         param("gymId").notEmpty()
     ],
     GymController.getGymById);
 
 router.get(
-    "/:gymId/purchased-users",
+    "/data/:gymId/purchased-users",
     verifyToken([IUserType.GYM_OWNER, IUserType.ADMIN]),
     GymController.getPurchasedUsersByGymId
 );
